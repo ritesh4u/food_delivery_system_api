@@ -5,21 +5,32 @@ var app = express();
 
 // for accepting form data
 var bodyParser = require('body-parser');
-var multer = require('multer');
-var upload = multer();
 
 // for parsing application/json
 app.use(bodyParser.json());
 
 // for parsing application/xwww-
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.urlencoded({
+	extended: true
+}));
 //form-urlencoded
 
-// for parsing multipart/form-data
-app.use(upload.array());
-app.use(express.static('public'));
 
+// for parsing multipart/form-data
+//global.multer = multer;
+//app.use(upload.single('image_file'));
+app.use('/recepies', express.static('recepies'));
+app.use('/ingridents', express.static('ingridents'));
+app.use('/profile_pic', express.static('profile_pic'));
 var router = require('./routes/router.js');
+
+app.use(function (req, res, next) {
+	res.header("Access-Control-Allow-Origin", "*");
+	res.header("Access-Control-Allow-Headers", 'Content-Type, Authorization, Content-Length, X-Requested-With');
+	res.header("Access-Control-Allow-Methods", "PUT, POST, GET, OPTIONS, DELETE");
+	next();
+});
+
 //Database connection
 app.use(function (req, res, next) {
 	global.connection = mysql.createConnection({
