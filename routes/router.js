@@ -14,7 +14,8 @@ module.exports = (function () {
     routes.post('/login', users.loginuser);
 
     //ingridents
-    routes.post('/add_new_ingrident', ingrident.addnewingrident);
+    routes.post('/add_new_ingredient', ingrident.addnewingrident);
+    routes.post('/get_all_ingredients', ingrident.getAllIngredients);
 
 
 

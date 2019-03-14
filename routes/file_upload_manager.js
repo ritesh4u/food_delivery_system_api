@@ -9,7 +9,7 @@ exports.saveIngridentImage = function (req, imageUploadcallback) {
 
     form.parse(req, function (error, fields, files) {
         if (fields.ingrident_name != undefined && fields.ingrident_description != undefined) {
-            var dbStorePath = '/ingridents/' + fields.ingrident_name + new Date().getMilliseconds() + ".jpg";
+            var dbStorePath = '/ingredients/' + fields.ingrident_name + new Date().getMilliseconds() + ".jpg";
             var newpath = __dirname + "/.." + dbStorePath;
             mv(files['image'].path, newpath, function (err) {
                 if (err) {
