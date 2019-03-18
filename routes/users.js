@@ -43,7 +43,7 @@ exports.addnewuser = (req, res) => {
 		res.send({
 			"status": 200,
 			"error": true,
-			"response": [],
+			"response": {},
 			"message": "All fields are complsary"
 		});
 	} else {
@@ -54,7 +54,7 @@ exports.addnewuser = (req, res) => {
 					res.send({
 						"status": 200,
 						"error": true,
-						"response": [],
+						"response": {},
 						"message": "Email Id is already register"
 					});
 				} else
