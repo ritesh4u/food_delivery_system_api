@@ -12,7 +12,7 @@ exports.addnewingredient = (req, res) => {
                     res.send({
                         "status": 200,
                         "error": true,
-                        "response": error,
+                        "response": "[" + error + "]",
                         "message": "something went wrong"
                     });
                 } else {

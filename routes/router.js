@@ -18,7 +18,7 @@ module.exports = (function () {
     routes.post('/get_all_ingredients', ingredient.getAllIngredients);
 
     //recepies
-    routes.post('/add_new_recepie', ingredient.addnewingredient);
+    routes.post('/add_new_menu_item', recepie.addnewrecepie);
 
     // route not found handler always keep in bottom
     routes.all('*', function (req, res) {
