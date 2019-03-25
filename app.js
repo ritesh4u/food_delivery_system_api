@@ -19,7 +19,7 @@ app.use(bodyParser.urlencoded({
 // for parsing multipart/form-data
 //global.multer = multer;
 //app.use(upload.single('image_file'));
-app.use('/recepies', express.static('recepies'));
+app.use('/recipes', express.static('recipes'));
 app.use('/ingredients', express.static('ingredients'));
 app.use('/profile_pic', express.static('profile_pic'));
 var router = require('./routes/router.js');

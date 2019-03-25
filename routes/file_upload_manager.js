@@ -48,23 +48,23 @@ exports.saveingredientImage = function (req, imageUploadcallback) {
         }
     });
 }
-exports.saveRecepieImage = function (req, imageUploadcallback) {
+exports.saveRecipeImage = function (req, imageUploadcallback) {
     var form = new formidable.IncomingForm();
 
     form.parse(req, function (error, fields, files) {
         if (fields.menu_item_name != undefined && fields.menu_item_description != undefined &&
             fields.menu_item_ingredients_array != undefined && fields.menu_item_price != undefined) {
-            var dbStorePath = '/recepies/' + fields.menu_item_name + new Date().getMilliseconds() + ".jpg";
+            var dbStorePath = '/recipes/' + fields.menu_item_name + new Date().getMilliseconds() + ".jpg";
             var newpath = __dirname + "/.." + dbStorePath;
             mv(files['image'].path, newpath, function (err) {
                 if (err) {
                     console.log(err)
                     imageUploadcallback(true, {
-                        recepie_image_url: "",
-                        recepie_name: "",
-                        recepie_description: "",
-                        recepie_price: "",
-                        recepie_ingredients_array: "",
+                        recipe_image_url: "",
+                        recipe_name: "",
+                        recipe_description: "",
+                        recipe_price: "",
+                        recipe_ingredients_array: "",
                         message: "something went wrong"
                     });
                     return;
@@ -72,21 +72,21 @@ exports.saveRecepieImage = function (req, imageUploadcallback) {
                 console.log('File uploaded and moved!');
                 console.log(JSON.stringify(fields));
                 imageUploadcallback(false, {
-                    recepie_image_url: dbStorePath,
-                    recepie_name: fields.menu_item_name,
-                    recepie_description: fields.menu_item_description,
-                    recepie_price: fields.menu_item_price,
-                    recepie_ingredients_array: fields.menu_item_ingredients_array,
+                    recipe_image_url: dbStorePath,
+                    recipe_name: fields.menu_item_name,
+                    recipe_description: fields.menu_item_description,
+                    recipe_price: fields.menu_item_price,
+                    recipe_ingredients_array: fields.menu_item_ingredients_array,
                 });
                 return;
             });
         } else {
             imageUploadcallback(true, {
-                recepie_image_url: "",
-                recepie_name: "",
-                recepie_description: "",
-                recepie_price: "",
-                recepie_ingredients_array: "",
+                recipe_image_url: "",
+                recipe_name: "",
+                recipe_description: "",
+                recipe_price: "",
+                recipe_ingredients_array: "",
                 message: "all fields are compulsary"
             });
             return;
