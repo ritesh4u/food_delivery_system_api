@@ -78,7 +78,3 @@ typings/
 
 # DynamoDB Local files
 .dynamodb/
-
-ingredients/
-profile_pic/
-public/
