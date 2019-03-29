@@ -2,6 +2,8 @@ var users = require('./users')
 var fileHandeler = require('./file_upload_manager')
 var ingredient = require('./ingredients')
 var recipe = require('./recipes')
+var cart = require('./cart')
+
 module.exports = (function () {
     var routes = require('express').Router();
     routes.get('/all', users.getalluser);
@@ -21,6 +23,11 @@ module.exports = (function () {
     routes.post('/add_new_recipe', recipe.addnewrecipe);
     routes.post('/get_all_recipes', recipe.getAllRecipes);
     routes.post('/get_recipe', recipe.getRecipeById);
+
+    //add to cart
+    routes.post('/add_to_cart', cart.addToCart);
+    routes.post('/get_my_cart', cart.getMyCart);
+    routes.post('/increase_cart_item_uantity', cart.increaseCartItemQuantity);
 
     // route not found handler always keep in bottom
     routes.all('*', function (req, res) {
