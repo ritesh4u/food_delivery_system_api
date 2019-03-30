@@ -86,3 +86,9 @@ exports.getRecipeById = (req, res) => {
         }
     });
 };
+
+exports.getRecipeObjectById = (recipe_id, callback) => {
+    connection.query("SELECT * FROM recipes WHERE recipe_id =" + recipe_id, function (recipeError, recipeResults) {
+        callback(recipeResults[0]);
+    });
+}

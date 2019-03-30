@@ -18,7 +18,7 @@ exports.generateCheckSum = (request, response) => {
         paramarray['EMAIL'] = request.body.email; // customer email id
         paramarray['MOBILE_NO'] = request.body.mobile_no; // customer 10 digit mobile no.
         paytm_checksum.genchecksum(paramarray, paytm_config.MERCHANT_KEY, function (err, res) {
-            console.log(JSON.stringify(res));
+            //console.log(JSON.stringify(res));
             response.send({
                 "status": 200,
                 "error": false,

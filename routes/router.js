@@ -29,6 +29,7 @@ module.exports = (function () {
     routes.post('/add_to_cart', cart.addToCart);
     routes.post('/get_my_cart', cart.getMyCart);
     routes.post('/increase_cart_item_quantity', cart.increaseCartItemQuantity);
+    routes.post('/remove_from_cart', cart.removeFromCart);
 
 
     // PAYTM checksum

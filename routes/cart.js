@@ -1,3 +1,5 @@
+var recipe = require("./recipes")
+var async = require("async");
 exports.addToCart = (req, res) => {
     //  console.log("user_id : " + req.body.user_id);
     // console.log("recipe_id : " + req.body.recipe_id);
@@ -36,8 +38,8 @@ exports.addToCart = (req, res) => {
                     "error": false,
                     "error_code": 1,
                     "response": {
-                        "item_quantity": cartQuantity,
-                        "cart_id": findOutput[0].my_cart_id
+                        "item_quantity": findOutput[0].quantity,
+                        "my_cart_id": findOutput[0].my_cart_id
                     },
                     "message": "Item already in cart "
                 });
@@ -60,12 +62,15 @@ exports.getMyCart = (req, res) => {
         connection.query(sqlQuery, function (findError, findOutput) {
             if (!findError) {
                 if (findOutput.length > 0) {
-                    res.send({
-                        "status": 200,
-                        "error": false,
-                        "cart_details": findOutput,
-                        "message": "cart item found"
+                    setIngredientArray(findOutput, function (dataOject) {
+                        res.send({
+                            "status": 200,
+                            "error": false,
+                            "cart_details": dataOject,
+                            "message": "cart item found"
+                        });
                     });
+
                 } else {
                     res.send({
                         "status": 200,
@@ -93,8 +98,8 @@ exports.getMyCart = (req, res) => {
     }
 }
 exports.increaseCartItemQuantity = (req, res) => {
-    if (req.body.cart_id != undefined && req.body.quantity != undefined) {
-        var updateSqlQuery = "UPDATE my_cart SET quantity ='" + req.body.quantity + "' WHERE my_cart.my_cart_id = " + req.body.cart_id;
+    if (req.body.my_cart_id != undefined && req.body.quantity != undefined) {
+        var updateSqlQuery = "UPDATE my_cart SET quantity ='" + req.body.quantity + "' WHERE my_cart.my_cart_id = " + req.body.my_cart_id;
         connection.query(updateSqlQuery, function (updateError, updateResult) {
             if (!updateError) {
                 res.send({
@@ -121,4 +126,83 @@ exports.increaseCartItemQuantity = (req, res) => {
             "message": "All field is required"
         });
     }
+}
+exports.removeFromCart = (req, res) => {
+    if (req.body.my_cart_id != undefined) {
+        var sqlDeleteQuery = "DELETE FROM my_cart where my_cart.my_cart_id = " + req.body.my_cart_id;
+        connection.query(sqlDeleteQuery, function (deleteError, deleteResult) {
+
+            if (!deleteError) {
+                res.send({
+                    "status": 200,
+                    "error": false,
+                    "response": {},
+                    "message": " Item Removed from cart successfully"
+                });
+            } else {
+                res.send({
+                    "status": 500,
+                    "error": true,
+                    "response": {},
+                    "message": "something went wrong"
+                });
+            }
+        });
+    } else {
+        res.send({
+            "status": 200,
+            "error": true,
+            "response": {},
+            "message": "All field is required"
+        });
+    }
+}
+var setIngredientArray = (dataOject, callback) => {
+    connection.query("SELECT * from ingredients", function (ingredientError, ingredientResults) {
+
+        var finalOutputArray = [];
+        var cartItemArray = dataOject;
+        async.forEachOf(cartItemArray, function (currentItem, key, everyCallBack) {
+            var innerOutputArray = [];
+            var ingredientArray = JSON.parse(currentItem.ingredients_contain_scale);
+            for (var i = 0; i < ingredientArray.length; i++) {
+                let foundedElement = ingredientResults.find(function (element) {
+                    return element.ingredient_id == ingredientArray[i].ingredient_id;
+                });
+                var protinValue = "0";
+                var fatValue = "0";
+                if (ingredientArray[i].content == "0") {
+                    protinValue = foundedElement.ingredient_nutrition_standard;
+                    fatValue = foundedElement.ingredient_fat_standard;
+                } else if (ingredientArray[i].content == "1") {
+                    protinValue = foundedElement.ingredient_nutrition_extra;
+                    fatValue = foundedElement.ingredient_fat_extra;
+                }
+                innerOutputArray.push({
+                    "ingredient_id": foundedElement.ingredient_id,
+                    "ingredient_name": foundedElement.ingredient_name,
+                    "content": ingredientArray[i].content,
+                    "protin_value": protinValue,
+                    "fat_value": fatValue
+                });
+            }
+            recipe.getRecipeObjectById(currentItem.recepie_id, function (recipeData) {
+                finalOutputArray.push({
+                    "my_cart_id": currentItem.my_cart_id,
+                    "recipe_id": currentItem.recepie_id,
+                    "recipe_name": recipeData.recipe_name,
+                    "recipe_price": recipeData.recipe_price,
+                    "recipe_image_url": recipeData.recipe_image_url,
+                    "quantity": currentItem.quantity,
+                    "ingredient_array": innerOutputArray
+                });
+                everyCallBack();
+            });
+
+        }, function (err, res) {
+
+            // console.log(JSON.stringify(finalOutputArray));
+            callback(finalOutputArray)
+        });
+    });
 }
