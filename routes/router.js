@@ -13,6 +13,7 @@ module.exports = (function () {
     //customer routes
     routes.post('/adduser', users.addnewuser);
     routes.post('/updateuser', users.updateuser);
+    routes.post('/update_profile_pic', users.updateProfilePic);
     routes.post('/deleteuser', users.deleteuser);
     routes.post('/login', users.loginuser);
 

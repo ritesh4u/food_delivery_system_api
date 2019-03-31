@@ -93,3 +93,32 @@ exports.saveRecipeImage = function (req, imageUploadcallback) {
         }
     });
 }
+
+exports.saveProfilePic = function (req, imageUploadcallback) {
+    var form = new formidable.IncomingForm();
+
+    form.parse(req, function (error, fields, files) {
+        if (fields.user_id != undefined) {
+            var dbStorePath = '/profile_pic/' + "user_" + fields.user_id + ".jpg";
+            var newpath = __dirname + "/.." + dbStorePath;
+            mv(files['image'].path, newpath, function (err) {
+                if (err) {
+                    console.log(err)
+                    imageUploadcallback(true, {
+                        message: "something went wrong"
+                    });
+                    return;
+                }
+                console.log('File uploaded and moved!');
+                console.log(JSON.stringify(fields));
+                imageUploadcallback(false, {});
+                return;
+            });
+        } else {
+            imageUploadcallback(true, {
+                message: "all fields are compulsary"
+            });
+            return;
+        }
+    });
+}

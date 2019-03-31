@@ -1,3 +1,4 @@
+var fileManager = require("./file_upload_manager");
 exports.getalluser = function (req, res) {
 	connection.query('SELECT * from customers', function (error, results, fields) {
 		if (error) {
@@ -77,19 +78,31 @@ exports.addnewuser = (req, res) => {
 };
 
 exports.updateuser = (req, res) => {
-	let sql = "UPDATE customers SET name='" + req.body.name + "',address = '" + req.body.address + "', dob='" + req.body.dob + "' WHERE mobile_no = '" + req.body.mobile_no + "'";
+	if (req.body.name == undefined || req.body.address == undefined || req.body.dob == undefined || req.body.user_id == undefined) {
+		res.send({
+			"status": 200,
+			"error": true,
+			"response": {},
+			"message": "all fields are reqired"
+
+		});
+		return;
+	}
+	let sql = "UPDATE customers SET name='" + req.body.name + "',address = '" + req.body.address + "', dob='" + req.body.dob + "' WHERE customer_id = '" + req.body.user_id + "'";
 	connection.query(sql, (error, result) => {
 		if (error) {
 			res.send({
 				"status": 500,
 				"error": error,
-				"response": null
+				"response": null,
+				"message": "internal error"
 			});
 		} else {
 			res.send({
 				"status": 200,
 				"error": false,
-				"response": result
+				"response": result,
+				"message": "Profile updated successfully"
 			});
 		}
 	});
@@ -136,8 +149,9 @@ exports.loginuser = (req, res) => {
 			} else {
 				if (result.length > 0) {
 					for (let i = 0; i < result.length; i++) {
-						delete result[i].password
+						//delete result[i].password
 					}
+					//	console.log(result[0]);
 					res.send({
 						"status": 200,
 						"error": false,
@@ -156,3 +170,23 @@ exports.loginuser = (req, res) => {
 		});
 	}
 };
+
+exports.updateProfilePic = (req, res) => {
+	fileManager.saveProfilePic(req, function (error, output) {
+		if (!error) {
+			res.send({
+				"status": 200,
+				"error": false,
+				"response": [],
+				"message": "Profile pic Update Successfully"
+			});
+		} else {
+			res.send({
+				"status": 200,
+				"error": true,
+				"response": [],
+				"message": "someting went wrong"
+			});
+		}
+	});
+}
