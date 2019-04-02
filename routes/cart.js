@@ -206,3 +206,4 @@ var setIngredientArray = (dataOject, callback) => {
         });
     });
 }
+exports.setIngredientArray = setIngredientArray;

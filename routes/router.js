@@ -4,6 +4,8 @@ var ingredient = require('./ingredients')
 var recipe = require('./recipes')
 var payments = require('./payment')
 var cart = require('./cart')
+var myOrders = require('./my_order')
+var tokenUpdate = require('./tokenUpdate')
 
 module.exports = (function () {
     var routes = require('express').Router();
@@ -36,6 +38,14 @@ module.exports = (function () {
     // PAYTM checksum
     routes.post('/generate_checksum', payments.generateCheckSum);
 
+    //place order
+    routes.post('/place_order', myOrders.placeaOrder);
+    routes.post('/my_orders', myOrders.myOrders);
+    routes.post('/order_details', myOrders.getOrderDetails);
+
+    //admin firease token update
+    routes.post('/update_token', tokenUpdate.storeToken);
+    //routes.post('/fcm_test', tokenUpdate.fcmTest);
 
     // route not found handler always keep in bottom
     routes.all('*', function (req, res) {
