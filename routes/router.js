@@ -39,9 +39,10 @@ module.exports = (function () {
     routes.post('/generate_checksum', payments.generateCheckSum);
 
     //place order
-    routes.post('/place_order', myOrders.placeaOrder);
+    routes.post('/place_order', myOrders.placeOrder);
     routes.post('/my_orders', myOrders.myOrders);
     routes.post('/order_details', myOrders.getOrderDetails);
+    routes.post('/update_order_status', myOrders.updateOrderStatus);
 
     //admin firease token update
     routes.post('/update_token', tokenUpdate.storeToken);

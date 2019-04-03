@@ -1,7 +1,7 @@
 var async = require("async");
 var cart = require('./cart')
 var tokenUpdate = require('./tokenUpdate')
-exports.placeaOrder = (req, res) => {
+exports.placeOrder = (req, res) => {
     if (req.body.user_id == undefined || req.body.amount == undefined) {
         res.send({
             "status": 200,
@@ -43,7 +43,7 @@ exports.placeaOrder = (req, res) => {
             deleteItemFromCart(cart_item_array, callback);
         },
         function (message, callback) {
-            tokenUpdate.sendNotification("New Order", "New Order is arrived please check the order", callback)
+            tokenUpdate.sendNotification("0", "New Order", "New Order is arrived please check the order", callback)
         }
     ], function (error, result) {
         if (!error) {
@@ -166,4 +166,29 @@ exports.getOrderDetails = (req, res) => {
             "message": "All field is required"
         });
     }
+}
+exports.updateOrderStatus = (req, res) => {
+    async.parallel([
+        function (callback) {
+            let sql = "UPDATE my_orders SET order_status='" + req.body.status + "' WHERE order_id = '" + req.body.order_id + "'";
+            connection.query(sql, (error, result) => {
+                callback();
+            });
+        },
+        function (callback) {
+            var noti_title = "Order status";
+            var noti_message = ""
+            if (req.body.status == "1") {
+                noti_message = "Your order is accepted"
+            } else if (req.body.status) {
+                noti_message = "Your order is rejected due to some reason"
+            }
+            tokenUpdate.sendNotification(req.body.user_id, noti_title, noti_message, callback);
+        }
+    ], function (errors, results) {
+        res.send({
+            "error": false,
+            "Message": "order Status updated successfully"
+        });
+    });
 }

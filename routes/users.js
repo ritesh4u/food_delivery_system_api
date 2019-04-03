@@ -77,6 +77,8 @@ exports.addnewuser = (req, res) => {
 	}
 };
 
+var async = require("async");
+
 exports.updateuser = (req, res) => {
 	if (req.body.name == undefined || req.body.address == undefined || req.body.dob == undefined || req.body.user_id == undefined) {
 		res.send({
