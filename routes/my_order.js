@@ -192,3 +192,79 @@ exports.updateOrderStatus = (req, res) => {
         });
     });
 }
+exports.getReport = (req, res) => {
+    var resObj = {
+        error: "",
+        message: "",
+        response: []
+    };
+
+    async.waterfall([
+        function (callback) {
+            var sqlQuery = "SELECT * from recipes";
+            connection.query(sqlQuery, function (error, output) {
+                if (output.length > 0) {
+                    callback(null, output);
+                } else {
+                    resObj.error = true;
+                    resObj.message = "recipe not found"
+                    callback(true)
+                }
+            });
+        },
+        function (recipesArray, callback) {
+            var myOrdersQuery = "SELECT * from order_details";
+            connection.query(myOrdersQuery, function (error, output) {
+                var outputArray = [];
+                if (output.length > 0) {
+                    for (var i = 0; i < recipesArray.length; i++) {
+                        for (var j = 0; j < output.length; j++) {
+                            if (recipesArray[i].recipe_id == output[j].recepie_id) {
+                                if (outputArray.length == 0) {
+                                    outputArray.push({
+                                        recipe_id: recipesArray[i].recipe_id,
+                                        recipe_name: recipesArray[i].recipe_name,
+                                        recipe_price: recipesArray[i].recipe_price,
+                                        recipe_image_url: recipesArray[i].recipe_image_url,
+                                        order_number_time: output[j].quantity
+                                    });
+                                } else {
+                                    let isFound = false;
+                                    for (var k = 0; k < outputArray.length; k++) {
+                                        if (outputArray[k].recipe_id == output[j].recepie_id) {
+                                            isFound = true
+                                            var temp = parseInt(outputArray[k].order_number_time);
+                                            var a = parseInt(output[j].quantity);
+                                            outputArray[k].order_number_time = (temp + a);
+                                        }
+                                    }
+                                    if (!isFound) {
+                                        outputArray.push({
+                                            recipe_id: recipesArray[i].recipe_id,
+                                            recipe_name: recipesArray[i].recipe_name,
+                                            recipe_price: recipesArray[i].recipe_price,
+                                            recipe_image_url: recipesArray[i].recipe_image_url,
+                                            order_number_time: output[j].quantity
+                                        });
+                                    }
+
+                                }
+                            }
+                        }
+                    }
+
+                    resObj.error = false;
+                    resObj.message = "data found";
+                    resObj.response = outputArray;
+
+                } else {
+                    resObj.error = true;
+                    resObj.message = "no data found"
+                }
+                callback(null, 'done');
+            });
+        }
+    ], function (error, results) {
+        res.send(JSON.stringify(resObj));
+    });
+};

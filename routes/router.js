@@ -43,6 +43,7 @@ module.exports = (function () {
     routes.post('/my_orders', myOrders.myOrders);
     routes.post('/order_details', myOrders.getOrderDetails);
     routes.post('/update_order_status', myOrders.updateOrderStatus);
+    routes.post('/get_report', myOrders.getReport);
 
     //admin firease token update
     routes.post('/update_token', tokenUpdate.storeToken);
