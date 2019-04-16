@@ -11,6 +11,7 @@ exports.placeOrder = (req, res) => {
         });
         return;
     }
+    var time_of_call = new Date().getTime();
     async.waterfall([
         function (callback) {
             var t = new Date();
@@ -21,7 +22,7 @@ exports.placeOrder = (req, res) => {
             var mm = ((t.getMinutes() < 10) ? '0' : '') + t.getMinutes();
             var ss = ((t.getSeconds() < 10) ? '0' : '') + t.getSeconds();
 
-            var time_of_call = new Date().getTime(); //YYYY + '-' + MM + '-' + DD + ' ' + HH + ':' + mm + ':' + ss;
+            //YYYY + '-' + MM + '-' + DD + ' ' + HH + ':' + mm + ':' + ss;
             //  console.log(time_of_call);
             sqlMyOrderQuery = "INSERT INTO my_orders (user_id,order_date,amount) VALUES('" + parseInt(req.body.user_id) + "','" + time_of_call + "'," + req.body.amount + ")";
             connection.query(sqlMyOrderQuery, function (myOrderError, myOrderOutput) {
@@ -37,7 +38,7 @@ exports.placeOrder = (req, res) => {
             });
         },
         function (my_order_id, cart_item_array, callback) {
-            addMyOrderDetails(my_order_id, cart_item_array, callback);
+            addMyOrderDetails(time_of_call, my_order_id, cart_item_array, callback);
         },
         function (cart_item_array, callback) {
             deleteItemFromCart(cart_item_array, callback);
@@ -58,10 +59,10 @@ exports.placeOrder = (req, res) => {
     });
 }
 
-var addMyOrderDetails = (my_order_id, cart_item_array, callback) => {
+var addMyOrderDetails = (time_of_call, my_order_id, cart_item_array, callback) => {
     async.forEachOf(cart_item_array, function (currentObject, key, iteratorCallback) {
-        var sqlQrderDetailQuery = "INSERT INTO order_details (order_id,recepie_id,ingredients_contain_scale,quantity) VALUES(" +
-            my_order_id + "," + currentObject.recepie_id + ",'" + currentObject.ingredients_contain_scale + "'," + currentObject.quantity + ")";
+        var sqlQrderDetailQuery = "INSERT INTO order_details (order_id,recepie_id,ingredients_contain_scale,quantity,order_date) VALUES(" +
+            my_order_id + "," + currentObject.recepie_id + ",'" + currentObject.ingredients_contain_scale + "'," + currentObject.quantity + "," + time_of_call + ")";
         connection.query(sqlQrderDetailQuery, function (oderDetailsError, orderDetailsOutput) {
             if (!oderDetailsError) {
                 //   console.log(orderDetailsOutput.insertId);
@@ -213,7 +214,13 @@ exports.getReport = (req, res) => {
             });
         },
         function (recipesArray, callback) {
-            var myOrdersQuery = "SELECT * from order_details";
+
+            var currentDate = new Date();
+            currentDate.setHours(0);
+            currentDate.setMinutes(0);
+            currentDate.setSeconds(0);
+            var time_of_call = currentDate.getTime();
+            var myOrdersQuery = "SELECT * from order_details where order_date >" + time_of_call + ";";
             connection.query(myOrdersQuery, function (error, output) {
                 var outputArray = [];
                 if (output.length > 0) {
